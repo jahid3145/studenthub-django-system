@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Teachers Directory — StudentHub{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="fw-bold m-0"><i class="fa-solid fa-chalkboard-user text-primary me-2"></i>Faculty Directory</h3>
+  </div>
+
+  <div class="row g-3">
+    {% for teacher in teachers %}
+    <div class="col-md-6 col-lg-4">
+      <div class="card border-0 shadow-sm p-3 h-100">
+        <div class="d-flex align-items-center mb-3">
+          <i class="fa-solid fa-user-tie fa-3x text-secondary me-3"></i>
+          <div>
+            <h5 class="fw-bold m-0">{{ teacher.user.get_full_name|default:teacher.user.username }}</h5>
+            <small class="text-primary fw-semibold">{{ teacher.employee_id }}</small>
+          </div>
+        </div>
+        <p class="text-muted small mb-1"><strong>Designation:</strong> {{ teacher.designation }}</p>
+        <p class="text-muted small mb-1"><strong>Department:</strong> {{ teacher.department.name|default:"Not Assigned" }}</p>
+        <p class="text-muted small mb-3"><strong>Qualification:</strong> {{ teacher.qualification|default:"N/A" }}</p>
+        
+        <div class="mt-auto border-top pt-2 text-end">
+          <a href="{% url 'teachers:teacher_detail' teacher.pk %}" class="btn btn-sm btn-outline-primary">
+            View Details
+          </a>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <div class="col-12"><p class="text-muted text-center py-4">No teachers registered.</p></div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

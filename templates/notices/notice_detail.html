@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ notice.title }} — StudentHub Notice{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="fw-bold m-0"><i class="fa-solid fa-bullhorn text-primary me-2"></i>Announcement Detail</h3>
+    <a href="{% url 'notices:notice_list' %}" class="btn btn-outline-secondary btn-sm">Back to Board</a>
+  </div>
+
+  <div class="card border-0 shadow-sm p-4">
+    <div class="d-flex justify-content-between align-items-start mb-3 border-bottom pb-3">
+      <div>
+        <span class="badge bg-{% if notice.priority == 'URGENT' %}danger{% else %}primary{% endif %} mb-2">
+          {{ notice.get_priority_display }} Priority
+        </span>
+        <h3 class="fw-bold text-dark">{{ notice.title }}</h3>
+        <p class="text-muted small m-0">
+          Published by <strong>{{ notice.created_by.get_full_name|default:notice.created_by.username }}</strong> on {{ notice.created_at|date:"F d, Y \a\t H:i" }}
+        </p>
+      </div>
+      <span class="badge bg-light text-dark border">Audience: {{ notice.get_target_audience_display }}</span>
+    </div>
+
+    <div class="notice-body py-3 text-dark style-content">
+      {{ notice.content|linebreaks }}
+    </div>
+
+    {% if notice.attachment %}
+    <div class="mt-4 pt-3 border-top">
+      <h6>Attached Document:</h6>
+      <a href="{{ notice.attachment.url }}" class="btn btn-sm btn-outline-primary" download>
+        <i class="fa-solid fa-paperclip me-1"></i> Download Attachment
+      </a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

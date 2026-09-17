@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}Teacher Dashboard — StudentHub{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h3 class="fw-bold m-0"><i class="fa-solid fa-chalkboard-user text-primary me-2"></i>Faculty Dashboard</h3>
+      <p class="text-muted small m-0">Welcome back, {{ user.get_full_name }}</p>
+    </div>
+    <a href="{% url 'attendance:dashboard' %}" class="btn btn-primary btn-sm">
+      <i class="fa-solid fa-check-double me-1"></i> Mark Attendance
+    </a>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-md-6 col-xl-4">
+      <div class="stat-card d-flex align-items-center justify-content-between">
+        <div>
+          <span class="text-muted small font-weight-semibold">ASSIGNED SUBJECTS</span>
+          <h2 class="fw-bold text-dark mt-1 mb-0">{{ total_assigned_subjects }}</h2>
+        </div>
+        <div class="icon-shape bg-primary-soft">
+          <i class="fa-solid fa-book"></i>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 col-xl-4">
+      <div class="stat-card d-flex align-items-center justify-content-between">
+        <div>
+          <span class="text-muted small font-weight-semibold">EMPLOYEE ID</span>
+          <h4 class="fw-bold text-primary mt-1 mb-0">{{ teacher.employee_id|default:"-" }}</h4>
+        </div>
+        <div class="icon-shape bg-info-soft">
+          <i class="fa-solid fa-id-badge"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Assigned Subjects List -->
+  <div class="card border-0 shadow-sm p-3 mb-4">
+    <h5 class="fw-bold mb-3"><i class="fa-solid fa-book-open text-primary me-2"></i>Assigned Subjects</h5>
+    <div class="row g-3">
+      {% for subject in assigned_subjects %}
+      <div class="col-md-4">
+        <div class="border rounded p-3 bg-light">
+          <span class="badge bg-secondary mb-2">Sem {{ subject.semester }}</span>
+          <h6 class="fw-bold mb-1">{{ subject.code }} - {{ subject.name }}</h6>
+          <small class="text-muted d-block">{{ subject.course.name }}</small>
+          <small class="text-primary fw-semibold mt-2 d-block">Credits: {{ subject.credits }}</small>
+        </div>
+      </div>
+      {% empty %}
+      <div class="col-12"><p class="text-muted text-center py-3">No assigned subjects found.</p></div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

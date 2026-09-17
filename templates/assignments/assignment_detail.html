@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ assignment.title }} — StudentHub{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="fw-bold m-0"><i class="fa-solid fa-file-lines text-primary me-2"></i>Assignment Details</h3>
+    <a href="{% url 'assignments:assignment_list' %}" class="btn btn-outline-secondary btn-sm">Back to List</a>
+  </div>
+
+  <div class="card border-0 shadow-sm p-4 mb-4">
+    <div class="d-flex justify-content-between align-items-start mb-3">
+      <div>
+        <span class="badge bg-primary mb-2">{{ assignment.subject.code }} - {{ assignment.subject.name }}</span>
+        <h4 class="fw-bold">{{ assignment.title }}</h4>
+      </div>
+      <div class="text-end">
+        <span class="badge bg-secondary p-2">Max Marks: {{ assignment.max_marks }}</span>
+        <p class="text-danger small fw-semibold mt-1 mb-0"><i class="fa-solid fa-clock me-1"></i>Due: {{ assignment.due_date|date:"M d, Y H:i" }}</p>
+      </div>
+    </div>
+    <p class="text-dark mb-4">{{ assignment.description }}</p>
+
+    {% if assignment.attachment %}
+      <a href="{{ assignment.attachment.url }}" class="btn btn-sm btn-light border me-2" download>
+        <i class="fa-solid fa-paperclip me-1"></i> Download Attachment
+      </a>
+    {% endif %}
+  </div>
+
+  {% if user.is_student %}
+  <!-- Student Submission Status -->
+  <div class="card border-0 shadow-sm p-4">
+    <h5 class="fw-bold mb-3 border-bottom pb-2">My Submission</h5>
+    {% if submission %}
+      <div class="alert alert-success">
+        <h6 class="fw-bold mb-1"><i class="fa-solid fa-circle-check me-2"></i>Submission Status: {{ submission.get_status_display }}</h6>
+        <small>Submitted on: {{ submission.submitted_at|date:"M d, Y H:i" }}</small>
+        {% if submission.marks_obtained is not None %}
+          <div class="mt-2 pt-2 border-top">
+            <strong>Grade / Score:</strong> {{ submission.marks_obtained }} / {{ assignment.max_marks }}
+            <p class="small text-muted m-0">Feedback: {{ submission.feedback|default:"No written feedback." }}</p>
+          </div>
+        {% endif %}
+      </div>
+    {% else %}
+      <div class="alert alert-warning">
+        <i class="fa-solid fa-triangle-exclamation me-2"></i>You have not submitted this assignment yet. Submissions can be uploaded via the REST API or Student Portal.
+      </div>
+    {% endif %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

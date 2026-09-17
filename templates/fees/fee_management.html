@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}Fee Management — StudentHub{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="fw-bold m-0"><i class="fa-solid fa-receipt text-primary me-2"></i>Fee Management & Billing</h3>
+  </div>
+
+  <div class="card border-0 shadow-sm p-4 mb-4">
+    <h5 class="fw-bold mb-3">Student Fee Balances</h5>
+    <div class="table-responsive">
+      <table class="table custom-table align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Student ID</th>
+            <th>Name</th>
+            <th>Fee Title</th>
+            <th>Final Amount</th>
+            <th>Paid Amount</th>
+            <th>Due Balance</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for fee in fee_records %}
+          <tr>
+            <td><span class="fw-bold text-primary">{{ fee.student.student_id }}</span></td>
+            <td>{{ fee.student.user.get_full_name }}</td>
+            <td>{{ fee.fee_structure.title }}</td>
+            <td>₹{{ fee.final_amount }}</td>
+            <td class="text-success fw-bold">₹{{ fee.paid_amount }}</td>
+            <td class="text-danger fw-bold">₹{{ fee.due_amount }}</td>
+            <td>
+              {% if fee.status == 'PAID' %}
+                <span class="badge bg-success">PAID</span>
+              {% elif fee.status == 'PARTIAL' %}
+                <span class="badge bg-warning">PARTIAL</span>
+              {% elif fee.status == 'OVERDUE' %}
+                <span class="badge bg-danger">OVERDUE</span>
+              {% else %}
+                <span class="badge bg-secondary">UNPAID</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="7" class="text-center text-muted py-3">No student fee records found.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

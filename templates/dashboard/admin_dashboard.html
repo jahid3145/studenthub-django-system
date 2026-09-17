@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard — StudentHub{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h3 class="fw-bold m-0"><i class="fa-solid fa-gauge-high text-primary me-2"></i>Admin Dashboard</h3>
+      <p class="text-muted small m-0">Institution Overview & System KPIs</p>
+    </div>
+    <a href="/api/docs/" target="_blank" class="btn btn-outline-primary btn-sm">
+      <i class="fa-solid fa-code me-1"></i> Interactive API Docs (Swagger)
+    </a>
+  </div>
+
+  <!-- KPI Metric Cards -->
+  <div class="row g-3 mb-4">
+    <div class="col-xl-3 col-sm-6">
+      <div class="stat-card d-flex align-items-center justify-content-between">
+        <div>
+          <span class="text-muted small font-weight-semibold">TOTAL STUDENTS</span>
+          <h2 class="fw-bold text-dark mt-1 mb-0">{{ total_students }}</h2>
+        </div>
+        <div class="icon-shape bg-primary-soft">
+          <i class="fa-solid fa-user-graduate"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-3 col-sm-6">
+      <div class="stat-card d-flex align-items-center justify-content-between">
+        <div>
+          <span class="text-muted small font-weight-semibold">FACULTY MEMBERS</span>
+          <h2 class="fw-bold text-dark mt-1 mb-0">{{ total_teachers }}</h2>
+        </div>
+        <div class="icon-shape bg-success-soft">
+          <i class="fa-solid fa-chalkboard-user"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-3 col-sm-6">
+      <div class="stat-card d-flex align-items-center justify-content-between">
+        <div>
+          <span class="text-muted small font-weight-semibold">DEPARTMENTS</span>
+          <h2 class="fw-bold text-dark mt-1 mb-0">{{ total_departments }}</h2>
+        </div>
+        <div class="icon-shape bg-info-soft">
+          <i class="fa-solid fa-building-columns"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-3 col-sm-6">
+      <div class="stat-card d-flex align-items-center justify-content-between">
+        <div>
+          <span class="text-muted small font-weight-semibold">FEES COLLECTED</span>
+          <h2 class="fw-bold text-success mt-1 mb-0">₹{{ total_fees_collected|floatformat:2 }}</h2>
+        </div>
+        <div class="icon-shape bg-warning-soft">
+          <i class="fa-solid fa-indian-rupee-sign"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content Section -->
+  <div class="row">
+    <!-- Recent Students Table -->
+    <div class="col-lg-8 mb-4">
+      <div class="card border-0 shadow-sm p-3">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-bold m-0"><i class="fa-solid fa-users text-primary me-2"></i>Recently Enrolled Students</h5>
+          <a href="{% url 'students:student_list' %}" class="btn btn-sm btn-light">View All</a>
+        </div>
+        <div class="table-responsive">
+          <table class="table custom-table align-middle mb-0">
+            <thead>
+              <tr>
+                <th>Student ID</th>
+                <th>Full Name</th>
+                <th>Department</th>
+                <th>Course</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for student in recent_students %}
+              <tr>
+                <td><span class="fw-semibold text-primary">{{ student.student_id }}</span></td>
+                <td>{{ student.user.get_full_name|default:student.user.username }}</td>
+                <td>{{ student.department.code|default:"-" }}</td>
+                <td>{{ student.course.code|default:"-" }}</td>
+                <td>
+                  <span class="badge badge-status bg-success-soft text-success">
+                    {{ student.get_status_display }}
+                  </span>
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="5" class="text-center text-muted py-3">No student records found.</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Notices Panel -->
+    <div class="col-lg-4 mb-4">
+      <div class="card border-0 shadow-sm p-3">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-bold m-0"><i class="fa-solid fa-bullhorn text-warning me-2"></i>Recent Announcements</h5>
+          <a href="{% url 'notices:notice_list' %}" class="btn btn-sm btn-light">Board</a>
+        </div>
+        <div class="list-group list-group-flush">
+          {% for notice in recent_notices %}
+          <a href="{% url 'notices:notice_detail' notice.pk %}" class="list-group-item list-group-item-action px-0 py-2">
+            <div class="d-flex w-100 justify-content-between align-items-center">
+              <h6 class="mb-1 fw-semibold text-dark text-truncate">{{ notice.title }}</h6>
+              <span class="badge bg-{% if notice.priority == 'URGENT' %}danger{% else %}primary{% endif %} rounded-pill">
+                {{ notice.get_priority_display }}
+              </span>
+            </div>
+            <small class="text-muted">{{ notice.created_at|date:"M d, Y" }}</small>
+          </a>
+          {% empty %}
+          <p class="text-muted small text-center py-3 m-0">No active notices.</p>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

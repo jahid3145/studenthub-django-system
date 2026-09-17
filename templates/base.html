@@ -1,0 +1,154 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}StudentHub — Academic Administration{% endblock %}</title>
+  
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <!-- Google Fonts: Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+  {% if user.is_authenticated %}
+  <div id="wrapper">
+    <!-- Sidebar Navigation -->
+    <nav id="sidebar">
+      <div class="sidebar-header d-flex align-items-center gap-2">
+        <i class="fa-solid fa-graduation-cap fa-2x text-primary"></i>
+        <div>
+          <h5 class="m-0 font-weight-bold text-white">StudentHub</h5>
+          <small class="text-muted">Academic Admin</small>
+        </div>
+      </div>
+
+      <ul class="list-unstyled components">
+        <li class="{% if request.resolver_match.app_name == 'dashboard' %}active{% endif %}">
+          <a href="{% url 'dashboard:index' %}">
+            <i class="fa-solid fa-gauge-high"></i> Dashboard
+          </a>
+        </li>
+
+        {% if user.is_admin_or_staff %}
+        <li class="{% if request.resolver_match.app_name == 'students' %}active{% endif %}">
+          <a href="{% url 'students:student_list' %}">
+            <i class="fa-solid fa-user-graduate"></i> Students
+          </a>
+        </li>
+        <li class="{% if request.resolver_match.app_name == 'teachers' %}active{% endif %}">
+          <a href="{% url 'teachers:teacher_list' %}">
+            <i class="fa-solid fa-chalkboard-user"></i> Teachers
+          </a>
+        </li>
+        <li class="{% if request.resolver_match.app_name == 'academics' %}active{% endif %}">
+          <a href="{% url 'academics:department_list' %}">
+            <i class="fa-solid fa-building-columns"></i> Academics
+          </a>
+        </li>
+        {% endif %}
+
+        {% if user.is_teacher %}
+        <li class="{% if request.resolver_match.app_name == 'students' %}active{% endif %}">
+          <a href="{% url 'students:student_list' %}">
+            <i class="fa-solid fa-user-graduate"></i> My Students
+          </a>
+        </li>
+        {% endif %}
+
+        <li class="{% if request.resolver_match.app_name == 'attendance' %}active{% endif %}">
+          <a href="{% url 'attendance:dashboard' %}">
+            <i class="fa-solid fa-calendar-check"></i> Attendance
+          </a>
+        </li>
+
+        <li class="{% if request.resolver_match.app_name == 'examinations' %}active{% endif %}">
+          <a href="{% url 'examinations:exam_list' %}">
+            <i class="fa-solid fa-file-pen"></i> Exams & Marks
+          </a>
+        </li>
+
+        <li class="{% if request.resolver_match.app_name == 'assignments' %}active{% endif %}">
+          <a href="{% url 'assignments:assignment_list' %}">
+            <i class="fa-solid fa-book-open"></i> Assignments
+          </a>
+        </li>
+
+        <li class="{% if request.resolver_match.app_name == 'fees' %}active{% endif %}">
+          <a href="{% url 'fees:fee_dashboard' %}">
+            <i class="fa-solid fa-receipt"></i> Fee Management
+          </a>
+        </li>
+
+        <li class="{% if request.resolver_match.app_name == 'notices' %}active{% endif %}">
+          <a href="{% url 'notices:notice_list' %}">
+            <i class="fa-solid fa-bullhorn"></i> Notice Board
+          </a>
+        </li>
+
+        <li class="mt-4 pt-3 border-top border-secondary">
+          <a href="/api/docs/" target="_blank">
+            <i class="fa-solid fa-code text-warning"></i> REST API Docs
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- Main Content Area -->
+    <div id="content">
+      <!-- Top Navbar -->
+      <nav class="top-navbar d-flex justify-content-between align-items-center">
+        <button type="button" id="sidebarCollapse" class="btn btn-outline-secondary btn-sm">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+
+        <div class="d-flex align-items-center gap-3">
+          <span class="badge bg-primary rounded-pill px-3 py-2">
+            Role: {{ user.get_role_display }}
+          </span>
+
+          <div class="dropdown">
+            <a href="#" class="d-flex align-items-center text-dark text-decoration-none dropdown-toggle" id="dropdownUser" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="fa-solid fa-circle-user fa-2x text-secondary me-2"></i>
+              <strong>{{ user.get_full_name|default:user.username }}</strong>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="dropdownUser">
+              <li><a class="dropdown-menu-item dropdown-item" href="{% url 'accounts:profile' %}"><i class="fa-solid fa-id-card me-2"></i> Profile Settings</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-menu-item dropdown-item text-danger" href="{% url 'accounts:logout' %}"><i class="fa-solid fa-right-from-bracket me-2"></i> Logout</a></li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+
+      <!-- System Messages / Flash Alerts -->
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      {% block content %}{% endblock %}
+    </div>
+  </div>
+  {% else %}
+    {% block auth_content %}{% endblock %}
+  {% endif %}
+
+  <!-- Bootstrap 5 Bundle JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Custom JS -->
+  <script src="{% static 'js/main.js' %}"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

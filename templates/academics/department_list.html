@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block title %}Departments — StudentHub{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="fw-bold m-0"><i class="fa-solid fa-building-columns text-primary me-2"></i>Academic Departments</h3>
+  </div>
+
+  <div class="row g-3">
+    {% for dept in departments %}
+    <div class="col-md-6 col-lg-4">
+      <div class="card border-0 shadow-sm p-3 h-100">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="badge bg-primary fs-6">{{ dept.code }}</span>
+          <span class="badge {% if dept.is_active %}bg-success{% else %}bg-secondary{% endif %}">
+            {% if dept.is_active %}Active{% else %}Inactive{% endif %}
+          </span>
+        </div>
+        <h5 class="fw-bold mb-2">{{ dept.name }}</h5>
+        <p class="text-muted small mb-3">{{ dept.description|default:"No description provided." }}</p>
+        <div class="border-top pt-2 mt-auto d-flex justify-content-between text-muted small">
+          <span>HOD: {{ dept.head_of_department.user.get_full_name|default:"Not Assigned" }}</span>
+          <span>Courses: {{ dept.courses.count }}</span>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <div class="col-12"><p class="text-muted text-center py-4">No departments found.</p></div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

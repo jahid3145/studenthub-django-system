@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Attendance Management — StudentHub{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h3 class="fw-bold m-0"><i class="fa-solid fa-calendar-check text-primary me-2"></i>Attendance Portal</h3>
+      <p class="text-muted small m-0">Mark and view daily student attendance sessions</p>
+    </div>
+  </div>
+
+  <!-- Recent Attendance Sessions Table -->
+  <div class="card border-0 shadow-sm p-4 mb-4">
+    <h5 class="fw-bold mb-3"><i class="fa-solid fa-clock-rotate-left text-primary me-2"></i>Recent Attendance Sessions</h5>
+    <div class="table-responsive">
+      <table class="table custom-table align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Subject</th>
+            <th>Class / Section</th>
+            <th>Marked By</th>
+            <th>Present</th>
+            <th>Absent</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for session in recent_sessions %}
+          <tr>
+            <td><span class="fw-semibold">{{ session.date|date:"M d, Y" }}</span></td>
+            <td><span class="badge bg-primary me-1">{{ session.subject.code }}</span> {{ session.subject.name }}</td>
+            <td>{{ session.class_section.name }}</td>
+            <td>{{ session.marked_by.user.get_full_name|default:"System" }}</td>
+            <td><span class="badge bg-success">{{ session.records.filter.count }} Present</span></td>
+            <td><span class="badge bg-danger">Absent</span></td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="6" class="text-center text-muted py-3">No attendance records logged yet. Use the REST API or DRF admin to log attendance sessions.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

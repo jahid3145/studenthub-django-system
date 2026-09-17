@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+
+{% block title %}Student Dashboard — StudentHub{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h3 class="fw-bold m-0"><i class="fa-solid fa-graduation-cap text-primary me-2"></i>Student Portal</h3>
+      <p class="text-muted small m-0">Student ID: {{ student.student_id|default:"-" }} | Sem: {{ student.current_semester|default:"1" }}</p>
+    </div>
+    {% if is_low_attendance %}
+    <span class="badge bg-danger p-2 fs-6 shadow-sm">
+      <i class="fa-solid fa-triangle-exclamation me-1"></i> Warning: Attendance Below 75%
+    </span>
+    {% endif %}
+  </div>
+
+  <!-- KPI Overview -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-6 col-xl-3">
+      <div class="stat-card d-flex align-items-center justify-content-between">
+        <div>
+          <span class="text-muted small font-weight-semibold">ATTENDANCE %</span>
+          <h2 class="fw-bold {% if is_low_attendance %}text-danger{% else %}text-success{% endif %} mt-1 mb-0">
+            {{ attendance_percentage }}%
+          </h2>
+        </div>
+        <div class="icon-shape {% if is_low_attendance %}bg-danger-soft{% else %}bg-success-soft{% endif %}">
+          <i class="fa-solid fa-calendar-check"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 col-xl-3">
+      <div class="stat-card d-flex align-items-center justify-content-between">
+        <div>
+          <span class="text-muted small font-weight-semibold">DEPARTMENT</span>
+          <h5 class="fw-bold text-dark mt-1 mb-0">{{ student.department.code|default:"-" }}</h5>
+        </div>
+        <div class="icon-shape bg-primary-soft">
+          <i class="fa-solid fa-building-columns"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 col-xl-3">
+      <div class="stat-card d-flex align-items-center justify-content-between">
+        <div>
+          <span class="text-muted small font-weight-semibold">COURSE</span>
+          <h5 class="fw-bold text-dark mt-1 mb-0">{{ student.course.code|default:"-" }}</h5>
+        </div>
+        <div class="icon-shape bg-info-soft">
+          <i class="fa-solid fa-book"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 col-xl-3">
+      <div class="stat-card d-flex align-items-center justify-content-between">
+        <div>
+          <span class="text-muted small font-weight-semibold">ACADEMIC STATUS</span>
+          <h5 class="fw-bold text-success mt-1 mb-0">{{ student.get_status_display|default:"Active" }}</h5>
+        </div>
+        <div class="icon-shape bg-success-soft">
+          <i class="fa-solid fa-user-check"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content Section -->
+  <div class="row">
+    <!-- Academic Results -->
+    <div class="col-lg-7 mb-4">
+      <div class="card border-0 shadow-sm p-3">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-bold m-0"><i class="fa-solid fa-award text-warning me-2"></i>Recent Exam Results</h5>
+          <a href="{% url 'examinations:transcript' %}" class="btn btn-sm btn-light">Transcript</a>
+        </div>
+        <div class="table-responsive">
+          <table class="table custom-table align-middle mb-0">
+            <thead>
+              <tr>
+                <th>Subject</th>
+                <th>Marks</th>
+                <th>Grade</th>
+                <th>Result</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for res in recent_results %}
+              <tr>
+                <td><span class="fw-semibold">{{ res.exam_schedule.subject.code }}</span> - {{ res.exam_schedule.subject.name }}</td>
+                <td>{{ res.marks_obtained }} / {{ res.exam_schedule.max_marks }}</td>
+                <td><span class="badge bg-info">{{ res.letter_grade }}</span></td>
+                <td>
+                  {% if res.is_pass %}
+                    <span class="badge bg-success">PASS</span>
+                  {% else %}
+                    <span class="badge bg-danger">FAIL</span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="4" class="text-center text-muted py-3">No exam results available yet.</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Notices -->
+    <div class="col-lg-5 mb-4">
+      <div class="card border-0 shadow-sm p-3">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-bold m-0"><i class="fa-solid fa-bullhorn text-primary me-2"></i>Campus Announcements</h5>
+        </div>
+        <div class="list-group list-group-flush">
+          {% for notice in notices %}
+          <a href="{% url 'notices:notice_detail' notice.pk %}" class="list-group-item list-group-item-action px-0 py-2">
+            <h6 class="mb-1 fw-semibold text-dark">{{ notice.title }}</h6>
+            <small class="text-muted">{{ notice.created_at|date:"M d, Y" }}</small>
+          </a>
+          {% empty %}
+          <p class="text-muted text-center py-3">No recent notices.</p>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

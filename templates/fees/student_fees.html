@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %}My Fee Status — StudentHub{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="fw-bold m-0"><i class="fa-solid fa-receipt text-primary me-2"></i>My Fee Status</h3>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-md-6">
+      <div class="stat-card">
+        <span class="text-muted small">TOTAL PAID</span>
+        <h2 class="fw-bold text-success mt-1 mb-0">₹{{ total_paid }}</h2>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="stat-card">
+        <span class="text-muted small">TOTAL PENDING BALANCE</span>
+        <h2 class="fw-bold text-danger mt-1 mb-0">₹{{ total_due }}</h2>
+      </div>
+    </div>
+  </div>
+
+  <div class="card border-0 shadow-sm p-4">
+    <h5 class="fw-bold mb-3">Fee Statements</h5>
+    <div class="table-responsive">
+      <table class="table custom-table align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Fee Description</th>
+            <th>Due Date</th>
+            <th>Total Amount</th>
+            <th>Paid Amount</th>
+            <th>Due Balance</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for fee in fee_records %}
+          <tr>
+            <td class="fw-bold">{{ fee.fee_structure.title }}</td>
+            <td>{{ fee.fee_structure.due_date|date:"M d, Y" }}</td>
+            <td>₹{{ fee.final_amount }}</td>
+            <td class="text-success fw-bold">₹{{ fee.paid_amount }}</td>
+            <td class="text-danger fw-bold">₹{{ fee.due_amount }}</td>
+            <td>
+              {% if fee.status == 'PAID' %}
+                <span class="badge bg-success">PAID</span>
+              {% elif fee.status == 'PARTIAL' %}
+                <span class="badge bg-warning">PARTIAL</span>
+              {% elif fee.status == 'OVERDUE' %}
+                <span class="badge bg-danger">OVERDUE</span>
+              {% else %}
+                <span class="badge bg-secondary">UNPAID</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="6" class="text-center text-muted py-3">No fee records found.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
